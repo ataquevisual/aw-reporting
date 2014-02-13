@@ -53,8 +53,8 @@ public class HTMLExporterTest {
     reportPHFI = createFeedItemReportRow(246813579L);
     list.add(reportPHFI);
 
-    File htmlFile = new File("target/testReport.html");
-    File pdfFile = new File("target/testReport.pdf");
+    File htmlFile = new File("target/testPReport.html");
+    File pdfFile = new File("target/testPReport.pdf");
     
     final File templateFile =
         new File("src/main/resources/templates/PLACEHOLDER_FEED_ITEM_REPORT.tmpl");
@@ -87,7 +87,9 @@ public class HTMLExporterTest {
     reportPHFI.setAvgCpc(new BigDecimal(2.00));
     reportPHFI.setAvgCpm(new BigDecimal(1.00));
     reportPHFI.setAvgPosition(new BigDecimal(2.2));
+    reportPHFI.setClickType("SiteLink");
     reportPHFI.setClicks((long) 33);
+    reportPHFI.setImpressions((long)333);
     reportPHFI.setStatus("ACTIVE");
     reportPHFI.setConversionRate1(new BigDecimal(1.5));
     reportPHFI.setConversionRateMany(new BigDecimal(3.3));
@@ -108,8 +110,8 @@ public class HTMLExporterTest {
     reportAccount = createAccountReportRow(246813579L);
     list.add(reportAccount);
 
-    File htmlFile = new File("target/testReport.html");
-    File pdfFile = new File("target/testReport.pdf");
+    File htmlFile = new File("target/testAReport.html");
+    File pdfFile = new File("target/testAReport.pdf");
     
     final File templateFile =
         new File("src/main/resources/templates/ACCOUNT_PERFORMANCE_REPORT.tmpl");

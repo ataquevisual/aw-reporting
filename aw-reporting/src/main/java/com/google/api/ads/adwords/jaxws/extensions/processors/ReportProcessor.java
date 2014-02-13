@@ -19,7 +19,9 @@ import com.google.api.ads.adwords.jaxws.extensions.downloader.MultipleClientRepo
 import com.google.api.ads.adwords.jaxws.extensions.report.model.csv.AnnotationBasedMappingStrategy;
 import com.google.api.ads.adwords.jaxws.extensions.report.model.csv.CsvReportEntitiesMapping;
 import com.google.api.ads.adwords.jaxws.extensions.report.model.entities.AuthMcc;
+import com.google.api.ads.adwords.jaxws.extensions.report.model.entities.NameImprClicks;
 import com.google.api.ads.adwords.jaxws.extensions.report.model.entities.Report;
+import com.google.api.ads.adwords.jaxws.extensions.report.model.entities.ReportPlaceholderFeedItem;
 import com.google.api.ads.adwords.jaxws.extensions.report.model.persistence.AuthTokenPersister;
 import com.google.api.ads.adwords.jaxws.extensions.report.model.persistence.EntityPersister;
 import com.google.api.ads.adwords.jaxws.extensions.report.model.util.DateUtil;
@@ -58,7 +60,10 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -759,7 +764,7 @@ public class ReportProcessor {
    * @throws Exception error creating PDF
    */
   public void generatePdf(String dateStart, String dateEnd, Properties properties,
-      File htmlTemplateFile, File outputDirectory) throws Exception {
+      File htmlTemplateFile, File outputDirectory, boolean sumAdExtensions) throws Exception {
 
     LOGGER.info("Starting PDF Generation");
     Map<String, Object> reportMap = Maps.newHashMap();
@@ -772,11 +777,49 @@ public class ReportProcessor {
         if (properties.containsKey(reportType.name())) {
           // Adding each report type rows from DB to the accounts montlyeports list.
 
-          List<Report> montlyReports = Lists.newArrayList(persister.listMonthReports(
+          List<Report> monthlyReports = Lists.newArrayList(persister.listMonthReports(
               csvReportEntitiesMapping.getReportBeanClass(reportType), accountId,
               DateUtil.parseDateTime(dateStart), DateUtil.parseDateTime(dateEnd)));
 
-          reportMap.put(reportType.name(), montlyReports);
+          if (sumAdExtensions && reportType.name() == "PLACEHOLDER_FEED_ITEM_REPORT") {
+            Map<String, NameImprClicks> adExtensionsMap = new HashMap<String, NameImprClicks>();
+            int sitelinks = 0;
+            for (Report report : monthlyReports) {
+              String clickType = ((ReportPlaceholderFeedItem)report).getClickType();
+              Long impressions = ((ReportPlaceholderFeedItem)report).getImpressions();
+              Long clicks = ((ReportPlaceholderFeedItem)report).getClicks();
+              if (!clickType.equals("Headline")){
+                if (clickType.equals("Sitelink")) sitelinks++;
+                if (adExtensionsMap.containsKey(clickType)) {
+                  NameImprClicks oldValues = adExtensionsMap.get(clickType);
+                  oldValues.impressions += impressions;
+                  oldValues.clicks += clicks;
+                  adExtensionsMap.put(clickType, oldValues);
+                } else {
+                  NameImprClicks Values = new NameImprClicks(); 
+                  Values.impressions = impressions;
+                  Values.clicks = clicks;
+                  adExtensionsMap.put(clickType, Values);
+                }
+              }
+            }
+
+            List<NameImprClicks> adExtensions = new ArrayList<NameImprClicks>();
+
+            for (Map.Entry<String, NameImprClicks> entry : adExtensionsMap.entrySet()) { 
+              NameImprClicks nic = new NameImprClicks();
+              nic.clickType = entry.getKey();
+              if (nic.clickType.equals("Sitelink")) {
+                nic.clickType = "Sitelinks (x" + sitelinks + ")";
+              }
+              nic.clicks = entry.getValue().clicks;
+              nic.impressions = entry.getValue().impressions;
+              adExtensions.add(nic);
+            }
+            reportMap.put("ADEXTENSIONS", adExtensions);
+          }
+
+          reportMap.put(reportType.name(), monthlyReports);
         }
       }
 

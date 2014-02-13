@@ -14,18 +14,17 @@
 
 package com.google.api.ads.adwords.jaxws.extensions.kratu.data;
 
-import com.google.api.ads.adwords.jaxws.extensions.report.model.persistence.EntityPersister;
-import com.google.api.ads.adwords.jaxws.extensions.report.model.util.DateUtil;
-import com.google.common.base.Stopwatch;
+import java.util.Date;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import com.google.api.ads.adwords.jaxws.extensions.report.model.util.DateUtil;
+import com.google.common.base.Stopwatch;
 
 /**
  * KratuProcessor
@@ -35,45 +34,46 @@ import java.util.concurrent.Executors;
 @Component
 public class KratuProcessor {
 
-  private String mccAccountId = null;
-  private StorageHelper storageHelper;
+	private String mccAccountId = null;
 
-  @Autowired
-  public KratuProcessor(@Value("${mccAccountId}") String mccAccountId) {
-    this.mccAccountId = mccAccountId.replaceAll("-", "");
-  }
+	@Autowired
+	private StorageHelper storageHelper;
 
-  public void processKratus(String dateStart, String dateEnd) throws InterruptedException {
-    processKratus(DateUtil.parseDateTime(dateStart).toDate(), DateUtil.parseDateTime(dateEnd).toDate());
-  }
+	@Autowired
+	public KratuProcessor(@Value("${mccAccountId}") String mccAccountId) {
+		this.mccAccountId = mccAccountId.replaceAll("-", "");
+	}
 
-  public RunnableKratu createRunnableKratu(StorageHelper storageHelper, Date dateStart, Date dateEnd) {
-    return new RunnableKratu(Long.valueOf(mccAccountId), storageHelper, dateStart, dateEnd);
-  }
-  
-  public void processKratus(Date dateStart, Date dateEnd) throws InterruptedException {
-    System.out.println("Processing Kratus for" + mccAccountId);
+	public void processKratus(String dateStart, String dateEnd)
+	    throws InterruptedException {
+		processKratus(DateUtil.parseDateTime(dateStart).toDate(), DateUtil
+		    .parseDateTime(dateEnd).toDate());
+	}
 
-    // We use a Latch so the main thread knows when all the worker threads are complete.
-    final CountDownLatch latch = new CountDownLatch(1);
-    Stopwatch stopwatch = new Stopwatch();
-    stopwatch.start();
+	public RunnableKratu createRunnableKratu(StorageHelper storageHelper,
+	    Date dateStart, Date dateEnd) {
+		return new RunnableKratu(Long.valueOf(mccAccountId), storageHelper,
+		    dateStart, dateEnd);
+	}
 
-    RunnableKratu runnableKratu = createRunnableKratu(storageHelper, dateStart, dateEnd);
+	public void processKratus(Date dateStart, Date dateEnd)
+	    throws InterruptedException {
+		System.out.println("Processing Kratus for" + mccAccountId);
 
-    ExecutorService executorService = Executors.newFixedThreadPool(1);
-    runnableKratu.setLatch(latch);
-    executorService.execute(runnableKratu);
+		// We use a Latch so the main thread knows when all the worker threads are
+		// complete.
+		final CountDownLatch latch = new CountDownLatch(1);
+		Stopwatch stopwatch = new Stopwatch();
+		stopwatch.start();
 
-    latch.await();
-    stopwatch.stop();    
-  }
+		RunnableKratu runnableKratu = createRunnableKratu(storageHelper, dateStart,
+		    dateEnd);
 
-  /**
-   * @param persister the persister to set
-   */
-  @Autowired
-  public void setPersister(EntityPersister persister) {
-    storageHelper = new StorageHelper(persister);
-  }
+		ExecutorService executorService = Executors.newFixedThreadPool(1);
+		runnableKratu.setLatch(latch);
+		executorService.execute(runnableKratu);
+
+		latch.await();
+		stopwatch.stop();
+	}
 }

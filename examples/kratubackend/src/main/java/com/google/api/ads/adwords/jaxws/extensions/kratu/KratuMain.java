@@ -14,15 +14,11 @@
 
 package com.google.api.ads.adwords.jaxws.extensions.kratu;
 
-import com.google.api.ads.adwords.jaxws.extensions.AwReporting;
-import com.google.api.ads.adwords.jaxws.extensions.kratu.data.Account;
-import com.google.api.ads.adwords.jaxws.extensions.kratu.data.KratuProcessor;
-import com.google.api.ads.adwords.jaxws.extensions.kratu.data.StorageHelper;
-import com.google.api.ads.adwords.jaxws.extensions.kratu.restserver.RestServer;
-import com.google.api.ads.adwords.jaxws.extensions.processors.ReportProcessor;
-import com.google.api.ads.adwords.jaxws.extensions.proxy.JaxWsProxySelector;
-import com.google.api.ads.adwords.jaxws.extensions.util.DataBaseType;
-import com.google.api.ads.adwords.jaxws.extensions.util.DynamicPropertyPlaceholderConfigurer;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.ProxySelector;
+import java.util.Properties;
+import java.util.Scanner;
 
 import org.apache.commons.cli.BasicParser;
 import org.apache.commons.cli.CommandLine;
@@ -39,11 +35,14 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.support.PropertiesLoaderUtils;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.net.ProxySelector;
-import java.util.Properties;
-import java.util.Scanner;
+import com.google.api.ads.adwords.jaxws.extensions.AwReporting;
+import com.google.api.ads.adwords.jaxws.extensions.kratu.data.Account;
+import com.google.api.ads.adwords.jaxws.extensions.kratu.data.KratuProcessor;
+import com.google.api.ads.adwords.jaxws.extensions.kratu.data.StorageHelper;
+import com.google.api.ads.adwords.jaxws.extensions.processors.ReportProcessor;
+import com.google.api.ads.adwords.jaxws.extensions.proxy.JaxWsProxySelector;
+import com.google.api.ads.adwords.jaxws.extensions.util.DataBaseType;
+import com.google.api.ads.adwords.jaxws.extensions.util.DynamicPropertyPlaceholderConfigurer;
 
 /**
  * Main class that executes the report processing logic delegating to the {@link ReportProcessor}.
@@ -107,7 +106,7 @@ public class KratuMain {
         initApplicationContextAndProperties(propertiesPath);
         updateAccounts();
 
-        RestServer.createRestServer(appCtx, propertiesPath);
+        //RestServer.createRestServer(appCtx, propertiesPath);
 
       } else {
         if (cmdLine.hasOption("startDate") && cmdLine.hasOption("endDate")) {

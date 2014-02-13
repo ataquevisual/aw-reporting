@@ -91,6 +91,12 @@ public class StorageHelper {
         Report.DAY, dateStart, dateEnd);
   }
 
+  public <R extends Report> List<R> getReportByCampaignId(Class<R> classR, Long campaignId, Date dateStart,
+      Date dateEnd) {
+    return entityPersister.get(classR, ReportCampaign.CAMPAIGN_ID, campaignId,
+        Report.DAY, dateStart, dateEnd);
+  }
+  
   // ReportAdGroup
   public List<ReportAdGroup> getReportAdGroupByCampaignId(Long campaignId, Date dateStart,
       Date dateEnd) {
@@ -104,6 +110,12 @@ public class StorageHelper {
         dateStart, dateEnd);
   }
 
+  public <R extends Report> List<R> getReportByAdGroupId(Class<R> classR, Long adGroupId, Date dateStart,
+      Date dateEnd) {
+    return entityPersister.get(classR, ReportAdGroup.ADGROUP_ID, adGroupId, Report.DAY,
+        dateStart, dateEnd);
+  }
+  
   // ReportAd
   public List<ReportAd> getReportAdByCampaignId(Long campaignId, Date dateStart, Date dateEnd) {
     return entityPersister.get(ReportAd.class, ReportAd.CAMPAIGN_ID, campaignId, Report.DAY,
@@ -117,6 +129,10 @@ public class StorageHelper {
 
   public List<ReportAd> getReportAdByAdId(Long adId, Date dateStart, Date dateEnd) {
     return entityPersister.get(ReportAd.class, ReportAd.AD_ID, adId, Report.DAY, dateStart, dateEnd);
+  }
+  
+  public <R extends Report> List<R> getReportByAdId(Class<R> classR, Long adId, Date dateStart, Date dateEnd) {
+    return entityPersister.get(classR, ReportAd.AD_ID, adId, Report.DAY, dateStart, dateEnd);
   }
 
   // ReportKeyword
@@ -137,6 +153,12 @@ public class StorageHelper {
     return entityPersister.get(ReportKeyword.class, ReportKeyword.KEYWORD_ID, keywordId, Report.DAY,
         dateStart, dateEnd);
   }
+  
+  public <R extends Report> List<R> getReportByCriterionId(Class<R> classR, Long keywordId, Date dateStart,
+      Date dateEnd) {
+    return entityPersister.get(classR, ReportKeyword.KEYWORD_ID, keywordId, Report.DAY,
+        dateStart, dateEnd);
+  }
 
   // ReportAdExtension
   public List<ReportAdExtension> getReportAdExtensionByCampaignId(Long campaignId, Date dateStart,
@@ -148,6 +170,12 @@ public class StorageHelper {
   public List<ReportAdExtension> getReportAdExtensionByAdExtensionId(Long adExtensionId, Date dateStart,
       Date dateEnd) {
     return entityPersister.get(ReportAdExtension.class, ReportAdExtension.ADEXTENSION_ID, adExtensionId, Report.DAY,
+        dateStart, dateEnd);
+  }
+  
+  public <R extends Report> List<R> getReportByAdExtensionId(Class<R> classR, Long adExtensionId, Date dateStart,
+      Date dateEnd) {
+    return entityPersister.get(classR, ReportAdExtension.ADEXTENSION_ID, adExtensionId, Report.DAY,
         dateStart, dateEnd);
   }
 

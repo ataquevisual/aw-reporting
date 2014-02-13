@@ -51,7 +51,7 @@ limitations under the License.
 
           	if (get('dateStart') != null && get('dateEnd') != null){
         		var dateParameters = "?dateStart="+get('dateStart')+"&dateEnd="+get('dateEnd');
-          		jsonProvider.load('../kratu/'+dateParameters, renderData);
+          		jsonProvider.load('../kratu/kratu/'+dateParameters, renderData);
           	} else {
         		alert('Please provide a DateRange in the URL with format ?dateStart=YYMMDD&dateEnd=YYMMDD')
           	}
